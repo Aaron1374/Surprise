@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday 3D Heart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin: 0; background-color: black; overflow: hidden;">
+
+    <!-- Birthday Message -->
+    <div id="message" style="
+        position: absolute; 
+        top: 50%; left: 50%; 
+        transform: translate(-50%, -50%);
+        font-size: 24px; 
+        font-family: Arial, sans-serif; 
+        color: white; 
+        text-shadow: 2px 2px 10px pink;
+        text-align: center;
+        z-index: 10;
+        display: none;
+    ">
+        Happy Birthday, My Love! ❤️
+    </div>
+
+    <!-- Question Popup -->
+    <div id="question" style="
+        position: absolute; 
+        top: 50%; left: 50%; 
+        transform: translate(-50%, -50%);
+        font-size: 20px;
+        font-family: Arial, sans-serif;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
+        z-index: 15;
+    ">
+        Who is the cutest person in the world? <br>
+        <input type="text" id="answer" style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 5px; text-align: center;">
+        <button onclick="checkAnswer()" style="margin-top: 10px; padding: 10px 20px; background-color: pink; color: white; border: none; border-radius: 5px;">Submit</button>
+        <div id="error-message" style="margin-top: 10px; color: red; font-size: 14px;"></div>
+    </div>
+
+    <script>
+        // Create Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 3;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create 3D Heart Geometry
+        function createHeartGeometry() {
+            const heartShape = new THREE.Shape();
+            heartShape.moveTo(0, -0.3);
+            heartShape.bezierCurveTo(0.5, -1.2, 1.8, -1.2, 1.8, -0.3);
+            heartShape.bezierCurveTo(1.8, 0.8, 0, 1.5, 0, 2);
+            heartShape.bezierCurveTo(0, 1.5, -1.8, 0.8, -1.8, -0.3);
+            heartShape.bezierCurveTo(-1.8, -1.2, -0.5, -1.2, 0, -0.3);
+
+            return new THREE.ExtrudeGeometry(heartShape, {
+                depth: 0.4,
+                bevelEnabled: true,
+                bevelThickness: 0.1,
+                bevelSize: 0.1,
+                bevelSegments: 15
+            });
+        }
+
+        // Create Main Heart Mesh
+        const heartGeometry = createHeartGeometry();
+        const heartMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xff3366, 
+            emissive: 0xaa0033, 
+            roughness: 0.2,
+            metalness: 0.8
+        });
+
+        const heartMesh = new THREE.Mesh(heartGeometry, heartMaterial);
+        heartMesh.rotation.x = Math.PI;
+        scene.add(heartMesh);
+
+        // Lighting Setup
+        const pointLight = new THREE.PointLight(0xff6699, 3, 10);
+        pointLight.position.set(0, 2, 3);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0xff3366, 0.5);
+        scene.add(ambientLight);
+
+        // Floating Small Hearts
+        const smallHearts = [];
+        for (let i = 0; i < 15; i++) {
+            const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+            const material = new THREE.MeshStandardMaterial({ color: 0xff99cc, emissive: 0xaa3366 });
+            const heart = new THREE.Mesh(geometry, material);
+            heart.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, Math.random() * 4 - 2);
+            scene.add(heart);
+            smallHearts.push(heart);
+        }
+
+        // Raycaster for Click Events
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Detect Mouse Clicks on the Heart
+        document.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObject(heartMesh);
+            if (intersects.length > 0) {
+                showQuestionPopup();
+            }
+        });
+
+        // Show the question popup
+        function showQuestionPopup() {
+            document.getElementById('question').style.display = 'block';
+        }
+
+        // Check the answer
+        function checkAnswer() {
+            const answer = document.getElementById('answer').value.toLowerCase();
+            if (answer === "me") {
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('question').style.display = 'none';
+            } else {
+                document.getElementById('error-message').innerText = "Try again, cutie! 💖";
+            }
+        }
+
+        // Mouse Interaction: Light follows cursor
+        document.addEventListener('mousemove', (event) => {
+            const x = (event.clientX / window.innerWidth) * 2 - 1;
+            const y = -(event.clientY / window.innerHeight) * 2 + 1;
+            pointLight.position.x = x * 3;
+            pointLight.position.y = y * 3;
+        });
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Pulsating Heart
+            const scale = 1 + 0.05 * Math.sin(Date.now() * 0.005);
+            heartMesh.scale.set(scale, scale, scale);
+
+            // Slow rotation
+            heartMesh.rotation.y += 0.005;
+
+            // Floating Hearts Animation
+            smallHearts.forEach(heart => {
+                heart.position.y += 0.005 * Math.sin(Date.now() * 0.001 + heart.position.x);
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+    </script>
+</body>
+</html>
