@@ -722,10 +722,10 @@ function createInteractionInstructions() {
   birthdayMessage.style.transform = 'translate(-50%, -50%)';
   birthdayMessage.style.color = '#ff44ff';
   birthdayMessage.style.fontFamily = 'Arial, sans-serif';
-  birthdayMessage.style.fontSize = 'rem';
+  birthdayMessage.style.fontSize = '3.5rem';
   birthdayMessage.style.fontWeight = 'bold';
   birthdayMessage.style.textAlign = 'center';
-  birthdayMessage.style.textShadow = '0 0 10px #fff, 0 0 20px #fff, 0 0 30px rgb(173, 13, 146)';
+  birthdayMessage.style.textShadow = '0 0 10px #fff, 0 0 20px #fff, 0 0 30px rgb(180, 20, 180)';
   birthdayMessage.style.opacity = '0';
   birthdayMessage.style.transition = 'opacity 2s';
   birthdayMessage.style.pointerEvents = 'none';
