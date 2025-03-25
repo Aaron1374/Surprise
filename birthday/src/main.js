@@ -729,7 +729,7 @@ function createInteractionInstructions() {
   birthdayMessage.style.opacity = '0';
   birthdayMessage.style.transition = 'opacity 2s';
   birthdayMessage.style.pointerEvents = 'none';
-  birthdayMessage.innerHTML = 'Happy Birthday!';
+  birthdayMessage.innerHTML = 'Happy Birthday ENZOOOO!';
   document.body.appendChild(birthdayMessage);
 }
 
